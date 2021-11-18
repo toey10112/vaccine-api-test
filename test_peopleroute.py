@@ -1,5 +1,7 @@
 import unittest
 import requests
+import json
+import jsonpath
 
 # Author = Suchon Prasert
 
@@ -36,6 +38,7 @@ class PeopleRouteTest(unittest.TestCase):
         api = URL + "/all"
         res = requests.get(api)
         self.assertEqual(200, res.status_code)
+        self.assertIsNotNone(res.json)
 
     def test_get_people_by_date(self):
         """
@@ -116,3 +119,62 @@ class PeopleRouteTest(unittest.TestCase):
         res = requests.delete(api)
         self.assertEqual(200, res.status_code)
         self.assertEqual(schema, res.json())
+
+    def test_count_total_people_without_date(self):
+        """
+
+        Test ID: 9
+        Test count total people need date
+        """
+        api = URL + "/count/total"
+        res = requests.get(api)
+        self.assertEqual(406, res.status_code)
+        self.assertEqual({'msg': 'no date param included'}, res.json())
+
+    def test_count_total_people_with_date(self):
+        """
+
+        Test ID: 10
+        Test count total people with date work normally
+        """
+        api = URL + "/count/total/23-10-2021"
+        res = requests.get(api)
+        self.assertEqual(200, res.status_code)
+        self.assertEqual({'count': 1, 'waiting': 0, 'vaccinated': 1, 'queue': {'9': 1}}, res.json())
+
+    def test_count_walk_in_without_date(self):
+        """
+
+        Test ID: 11
+        Test count walk in people without date
+        """
+        api = URL + "/count/walkin"
+        res = requests.get(api)
+        self.assertEqual(406, res.status_code)
+        self.assertEqual({'msg': 'no date param included'}, res.json())
+
+    def test_count_walk_in_with_date(self):
+        """
+
+        Test ID: 12
+        Test count walk in people with dated work normally
+        """
+        api = URL + "/count/walkin/23-10-2021"
+        res = requests.get(api)
+        json_res = json.loads(res.text)
+        walkin = jsonpath.jsonpath(json_res, 'total_walkin')
+        self.assertEqual(200, res.status_code)
+        self.assertEqual(walkin[0], 29)
+
+    def test_cancel_reservation_without_date_and_id(self):
+        """
+
+        Test ID: 13
+        Test cancel reservation without date and id
+        """
+        api = URL + "cancel"
+        res = requests.get(api)
+        self.assertEqual(406, res.status_code)
+        self.assertEqual({'msg': 'no date or reservationID included'}, res.json())
+
+
