@@ -173,7 +173,7 @@ class PeopleRouteTest(unittest.TestCase):
         Test cancel reservation without date and id
         """
         api = URL + "/cancel"
-        res = requests.get(api)
+        res = requests.patch(api)
         self.assertEqual(406, res.status_code)
         self.assertEqual({'msg': 'no date or reservationID included'}, res.json())
 
