@@ -172,9 +172,31 @@ class PeopleRouteTest(unittest.TestCase):
         Test ID: 13
         Test cancel reservation without date and id
         """
-        api = URL + "cancel"
+        api = URL + "/cancel"
         res = requests.get(api)
         self.assertEqual(406, res.status_code)
         self.assertEqual({'msg': 'no date or reservationID included'}, res.json())
 
+    def test_cancel_reservation_with_date_and_id(self):
+        """
+
+        Test ID: 14
+        Test cancel reservation with date and id
+        """
+        api = URL + "/cancel/23-10-2021/3"
+        # given id that doesn't have in queue
+        res = requests.patch(api)
+        self.assertEqual(304, res.status_code)
+        self.assertEqual({"msg": 'remove 3 on 23-10-2021 unsuccessful'}, res.json)
+
+    def test_vaccinated_without_date_or_id(self):
+        """
+
+        Test ID: 15
+        Test vaccinated people without date or id
+        """
+        api = URL + "/vaccinated/3"
+        res = requests.patch(api)
+        self.assertEqual(406, res.status_code)
+        self.assertEqual({"msg": "no date or reservationID included"}, res.json())
 
